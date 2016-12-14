@@ -211,6 +211,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    //create and show about dialog
+    private void showAboutDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("About");
+        dialog.setMessage("Build 1.0.0");
+        dialog.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -220,11 +228,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
-            //create and show about dialog
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle("About");
-            dialog.setMessage("Build 1.0.0");
-            dialog.show();
+            showAboutDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -236,18 +240,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_about) {
+            showAboutDialog();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
