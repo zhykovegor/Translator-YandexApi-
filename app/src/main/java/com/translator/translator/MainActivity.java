@@ -1,7 +1,9 @@
 package com.translator.translator;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -36,11 +38,15 @@ public class MainActivity extends AppCompatActivity
 
     private TextView text;
     private TextView translated;
+    private Spinner spinner;
 
     private String selectedLanguage;
     private Gson gson = new GsonBuilder().create();
     private final String BASE_URL = "https://translate.yandex.net";
     private final String KEY = "trnsl.1.1.20161213T090001Z.b58c535961cc82b7.181d722d1506c2ac62e75282e49c101705e43a2f";
+
+    //array contains allowed languages
+    final String[] languages = {"en-ru", "ru-en"};
 
     //setting retrofit
     private Retrofit retrofit = new Retrofit.Builder()
@@ -62,6 +68,21 @@ public class MainActivity extends AppCompatActivity
     private Toolbar getToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         return toolbar;
+    }
+
+    //shared preference save method
+    private void saveSetting(int index){
+        SharedPreferences sPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sPref.edit();
+        editor.putInt("lang", index);
+        editor.commit();
+    }
+
+    //shared preference load method
+    private int loadSetting(){
+        SharedPreferences sPref = getPreferences(MODE_PRIVATE);
+        selectedLanguage = languages[sPref.getInt("lang", 0)];
+        return sPref.getInt("lang", 0);
     }
 
     //FloatingButton
@@ -115,23 +136,22 @@ public class MainActivity extends AppCompatActivity
 
     //Spinner
     private void initSpinner() {
-        //array contains allowed languages
-        final String[] languages = {"en-ru", "ru-en"};
         //adapter
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //spinner
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(adapter);
-
-        spinner.setSelection(0);
 
         //event listener
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLanguage = languages[i];
+
+                //saving setting to shared preference
+                saveSetting(i);
             }
 
             @Override
@@ -158,12 +178,20 @@ public class MainActivity extends AppCompatActivity
         //init drawer
         initDrawer(toolbar);
 
-        //init spinner
+        //init spinner and load setting from shared preference
         initSpinner();
+        spinner.setSelection(loadSetting());
 
         //finding views
         findViews();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //load setting from shared preference
+        spinner.setSelection(loadSetting());
     }
 
     @Override
@@ -191,8 +219,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_about) {
+            //create and show about dialog
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle("About");
+            dialog.setMessage("Build 1.0.0");
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);
